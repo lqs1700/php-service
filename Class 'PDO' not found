@@ -1,0 +1,8 @@
+
+rpm -qa|grep php 查看php扩展
+
+yum install php-pdo
+yum install php-gd
+service php-fpm restart
+service nginx restart
+service mariadb restart
