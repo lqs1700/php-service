@@ -1,0 +1,18 @@
+1.下载安装php xdebug扩展
+  php.ini末尾加上
+  [xdebug]
+  zend_extension=php_xdebug.dll
+  xdebug.remote_enable = On
+  xdebug.remote_handler = dbgp   
+  xdebug.remote_host= localhost
+  xdebug.remote_port = 9000
+  xdebug.idekey = PHPSTORM
+
+
+2.phpstorm里设置interpreter
+
+3.phpstorm里设置Xdebug
+
+4.phpstorm里配置server
+
+5.
