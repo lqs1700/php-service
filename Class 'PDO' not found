@@ -1,4 +1,4 @@
-
+解决办法：
 rpm -qa|grep php 查看php扩展
 
 yum install php-pdo
