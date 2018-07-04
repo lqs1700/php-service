@@ -1,0 +1,63 @@
+html代码：
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FormData</title>
+    <script type="text/javascript" src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
+</head>
+<body>
+<form name="form1" id="form1">
+    <p>name:<input type="text" name="name" /></p>
+    <p>gender:<input type="radio" name="gender" value="1" />male <input type="radio" name="gender" value="2" />female</p>
+    <p>stu-number：<input type="text" name="number" /></p>
+    <p>photo:<input type="file" name="photo" id="photo"></p>
+    <p><input type="button" name="b1" value="submit" onclick="fsubmit()" /></p>
+</form>
+<div id="result"></div>
+</body>
+
+<script>
+    function fsubmit() {
+        var form=document.getElementById("form1");
+        var fd =new FormData(form);
+        $.ajax({
+            url: "upload01.php",
+            type: "POST",
+            data: fd,
+            processData: false,  // 告诉jQuery不要去处理发送的数据
+            contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
+            success: function(response,status,xhr){
+                console.log(xhr);
+                var json=$.parseJSON(response);
+                var result = '';
+                result +="个人信息：<br/>name:"+json['name']+"<br/>gender:"+json['gender']+"<br/>number:"+json['number'];
+                result += '<br/>头像：<img src="' + json['photo'] + '" height="100" style="border-radius: 50%;" />';
+                $('#result').html(result);
+            }
+        });
+        return false;
+    }
+</script>
+
+
+php代码：
+<?php
+var_dump($_FILES);
+$name = isset($_POST['name'])? $_POST['name'] : '';
+$gender = isset($_POST['gender'])? $_POST['gender'] : '';
+$number = isset($_POST['number'])? $_POST['number'] : '';
+$filename = time().substr($_FILES['photo']['name'], strrpos($_FILES['photo']['name'],'.'));
+$response = array();
+
+if(move_uploaded_file($_FILES['photo']['tmp_name'], './imges/'.$filename)){
+    $response['isSuccess'] = true;
+    $response['name'] = $name;
+    $response['gender'] = $gender;
+    $response['number'] = $number;
+    $response['photo'] = $filename;
+}else{
+    $response['isSuccess'] = false;
+}
+echo json_encode($response);
