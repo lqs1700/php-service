@@ -1,0 +1,95 @@
+1.查看composer.json,里面要求的worker版本，然后安装相对应版本，如下（我的1.0）
+composer require topthink/think-worker 1.0
+
+2.删除workerman下的workerman文件夹，然后执行
+composer require workerman/workerman-for-win
+
+
+3.index模块下index.php文件的代码
+
+<?php
+namespace app\index\controller;
+
+class Index
+{
+    public function index()
+    {
+        return view('',[]);
+    }
+}
+
+4.index模块下模板文件index.html的代码
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script type="text/javascript">
+		// 假设服务端ip为127.0.0.1
+		ws = new WebSocket("ws://127.0.0.1:2346");
+		ws.onopen = function() {
+		    console.log("连接成功");
+		    ws.send('tom');
+		    console.log("给服务端发送一个字符串：tom");
+		};
+		ws.onmessage = function(e) {
+		    console.log("收到服务端的消息：" + e.data);
+		};
+		</script>
+	</head>
+	<body>
+	</body>
+</html>
+
+5.socket模块下index.php的代码
+
+<?php
+namespace app\socket\controller;
+use Workerman\Worker;
+ 
+class Index
+{
+    public function index()
+    {
+ 
+		// 创建一个Worker监听2346端口，使用websocket协议通讯
+		$ws_worker = new Worker("websocket://0.0.0.0:2346");
+		
+		// 启动4个进程对外提供服务
+		$ws_worker->count = 4;
+		
+		// 当收到客户端发来的数据后返回hello $data给客户端
+		$ws_worker->onMessage = function($connection, $data)
+		{
+		    // 向客户端发送hello $data
+		    $connection->send('hello ' . $data);
+		};
+		
+		// 运行worker
+		Worker::runAll();
+	
+    }
+}
+
+6.public文件夹下socket.php文件的代码
+
+<?php
+// 启动socket，通过cmd启动
+ 
+// 定义应用目录
+define('APP_PATH', __DIR__ . '/../application/');
+//绑定到socket所在模块
+define('BIND_MODULE','socket/index/index');
+// 加载框架引导文件
+require __DIR__ . '/../thinkphp/start.php';
+
+7.启动服务器，cmd进入php安装目录执行 public/socket.php,如下：
+E:\wamp64\bin\php\php5.6.25>php E:\wamp64\www\tp505\public\socket.php
+
+8.网页上打开项目/public,f12显示：
+连接成功 
+给服务端发送一个字符串：tom 
+收到服务端的消息：hello tom
+
+完毕！
