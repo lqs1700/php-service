@@ -1,0 +1,42 @@
+1.父类 BaseValidate.php
+class BaseValidate extends Validate
+{
+    public function goCheck(){
+        //必须设置contetn-type:application/json
+        $request = Request::instance();
+        $params = $request->param();
+        $params['token'] = $request->header('token');
+
+        if (!$this->check($params)) {
+            $exception = new ParameterException(
+                [
+                    // $this->error有一个问题，并不是一定返回数组，需要判断
+                    'msg' => is_array($this->error) ? implode(
+                        ';', $this->error) : $this->error,
+                ]);
+            throw $exception;
+        }
+        return true;
+    }
+    
+}
+
+2.子类定义规则
+class AddressNew extends BaseValidate
+{
+    protected $rule = [
+        'name' => 'require|isNotEmpty',
+        'mobile' => 'require|isMobile',
+        'province' => 'require|isNotEmpty',
+        'city' => 'require|isNotEmpty',
+        'country' => 'require|isNotEmpty',
+        'detail' => 'require|isNotEmpty',
+    ];
+}
+
+3.控制器验证
+public function createOrUpdateAddress()
+{
+    $validate = new AddressNew();
+    $validate->goCheck();
+｝
