@@ -1,0 +1,35 @@
+//创建trait类 aop面向切面编程
+trait Test1
+{
+    public function demo1()
+    {
+        return 'Test1::demo1()<br />';
+    }
+}
+
+
+//创建基类(父类):Father
+class Father
+{
+    public function demo1()
+    {
+        return 'Father::demo1<br />';
+    }
+
+}
+
+//创建自定义类:MyClass 是Father的派生类(子类)
+class MyClass extends Father
+{
+    use Test1;
+    public function demo1()
+    {
+        return 'MyClass::demo1<br />';
+    }
+}
+
+//创建自定义MyClass的对象
+$obj = new MyClass;
+
+//访问$obj对象的demo1()方法
+echo $obj -> demo1();
