@@ -1,0 +1,9 @@
+1.extra是tp5默认的常量配置路径
+
+2.配置方法：setting.php
+return [
+    'img_prefix' => 'https://www.liuqingsong.xin/Zerg/public/images/',
+];
+
+3.调用方法
+$aaa = config(setting.img_prefix)
