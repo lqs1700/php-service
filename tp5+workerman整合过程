@@ -66,6 +66,23 @@ class Index
 		    $connection->send('hello ' . $data);
 		};
 		
+		$ws_worker->onConnect = function($connection, $data)
+		{
+		    // 向客户端发送hello $data
+		    $connection->send('成功连接到websocket服务器');
+		};
+		
+		public function onClose($connection)
+    		{
+        	    $connection->send('己退出');	
+		};
+		
+		$ws_worker->onError = function($connection, $data)
+		{
+		    // 向客户端发送hello $data
+		    $connection->send('错误提示：'.$data);
+		};
+		
 		// 运行worker
 		Worker::runAll();
 	
