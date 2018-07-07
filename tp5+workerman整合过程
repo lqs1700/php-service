@@ -42,67 +42,81 @@ class Index
 	</body>
 </html>
 
-5.socket模块下index.php的代码
-
+5.push模块下worker.php的代码
 <?php
-namespace app\socket\controller;
-use Workerman\Worker;
- 
-class Index
+
+namespace app\push\controller;
+
+use think\worker\Server;
+
+class Worker extends Server
 {
-    public function index()
+    protected $socket = 'websocket://127.0.0.1:2346';
+    
+    public function index(){
+    	$this->start();
+    }
+    
+    /**
+     * 收到信息
+     * @param $connection
+     * @param $data
+     */
+    public function onMessage($connection, $data)
     {
- 
-		// 创建一个Worker监听2346端口，使用websocket协议通讯
-		$ws_worker = new Worker("websocket://0.0.0.0:2346");
-		
-		// 启动4个进程对外提供服务
-		$ws_worker->count = 4;
-		
-		// 当收到客户端发来的数据后返回hello $data给客户端
-		$ws_worker->onMessage = function($connection, $data)
-		{
-		    // 向客户端发送hello $data
-		    $connection->send('hello ' . $data);
-		};
-		
-		$ws_worker->onConnect = function($connection, $data)
-		{
-		    // 向客户端发送hello $data
-		    $connection->send('成功连接到websocket服务器');
-		};
-		
-		public function onClose($connection)
-    		{
-        	    $connection->send('己退出');	
-		};
-		
-		$ws_worker->onError = function($connection, $data)
-		{
-		    // 向客户端发送hello $data
-		    $connection->send('错误提示：'.$data);
-		};
-		
-		// 运行worker
-		Worker::runAll();
-	
+        $connection->send('我收到你的信息了');
+    }
+
+    /**
+     * 当连接建立时触发的回调函数
+     * @param $connection
+     */
+    public function onConnect($connection)
+    {
+
+    }
+
+    /**
+     * 当连接断开时触发的回调函数
+     * @param $connection
+     */
+    public function onClose($connection)
+    {
+        
+    }
+
+    /**
+     * 当客户端的连接上发生错误时触发
+     * @param $connection
+     * @param $code
+     * @param $msg
+     */
+    public function onError($connection, $code, $msg)
+    {
+        echo "error $code $msg\n";
+    }
+
+    /**
+     * 每个进程启动
+     * @param $worker
+     */
+    public function onWorkerStart($worker)
+    {
+
     }
 }
 
-6.public文件夹下socket.php文件的代码
+
+6.public文件夹下server.php文件的代码
 
 <?php
-// 启动socket，通过cmd启动
- 
-// 定义应用目录
-define('APP_PATH', __DIR__ . '/../application/');
-//绑定到socket所在模块
-define('BIND_MODULE','socket/index/index');
+define('APP_PATH', __DIR__ . '/application/');
+define('BIND_MODULE','push/Worker');
 // 加载框架引导文件
 require __DIR__ . '/../thinkphp/start.php';
 
 7.启动服务器，cmd进入php安装目录执行 public/socket.php,如下：
-E:\wamp64\bin\php\php5.6.25>php E:\wamp64\www\tp505\public\socket.php
+E:\wamp64\bin\php\php5.6.25>php E:\wamp64\www\tp505\public\server.php
 
 8.网页上打开项目/public,f12显示：
 连接成功 
