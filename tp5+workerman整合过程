@@ -19,30 +19,53 @@ class Index
 }
 
 4.index模块下模板文件index.html的代码
-
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="UTF-8">
-		<title></title>
-		<script type="text/javascript">
-		// 假设服务端ip为127.0.0.1
-		ws = new WebSocket("ws://127.0.0.1:2346");
-		ws.onopen = function() {
-		    console.log("连接成功");
-		    ws.send('tom');
-		    console.log("给服务端发送一个字符串：tom");
-		};
-		ws.onmessage = function(e) {
-		    console.log("收到服务端的消息：" + e.data);
-		};
-		</script>
-	</head>
-	<body>
-	</body>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        #submit{width: 50px;}
+        p{padding: 0;margin: 0;}
+        br{height: 0;}
+    </style>
+</head>
+<body>
+<div>
+    <input id="itext" type="text" required>
+    <input type="button" id="submit" value="提交" onclick="submitmes()">
+    <div id="test"></div>
+</div>
+<script type="text/javascript">
+    // 假设服务端ip为127.0.0.1
+    ws = new WebSocket("ws://127.0.0.1:2346");
+
+    ws.onopen = function() {
+        console.log("连接成功");
+        var itext = document.getElementById('itext').value;
+        ws.send(itext);
+    };
+
+    var submitmes = function(){
+        var itext = document.getElementById('itext').value;
+        ws.send(itext);
+    };
+
+    ws.onmessage = function(e) {
+        var ptest = document.getElementById('test');
+        if(e.data){
+            console.log("收到服务端的消息：" + e.data);
+            ptest.innerHTML += "<p>"+e.data+"</p>";
+        }
+    };
+
+</script>
+</body>
 </html>
 
 5.push模块下worker.php的代码
+<?php
+
 <?php
 
 namespace app\push\controller;
@@ -52,11 +75,10 @@ use think\worker\Server;
 class Worker extends Server
 {
     protected $socket = 'websocket://127.0.0.1:2346';
-    
+
     public function index(){
-    	$this->start();
+        $this->start();
     }
-    
     /**
      * 收到信息
      * @param $connection
@@ -64,7 +86,9 @@ class Worker extends Server
      */
     public function onMessage($connection, $data)
     {
-        $connection->send('我收到你的信息了');
+        foreach ($this->worker->connections as $conn) {
+            $conn->send((string)$data);
+        }
     }
 
     /**
@@ -73,7 +97,7 @@ class Worker extends Server
      */
     public function onConnect($connection)
     {
-
+        $connection->send("连接成功");
     }
 
     /**
@@ -82,9 +106,8 @@ class Worker extends Server
      */
     public function onClose($connection)
     {
-        
-    }
 
+    }
     /**
      * 当客户端的连接上发生错误时触发
      * @param $connection
