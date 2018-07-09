@@ -1,0 +1,81 @@
+<?php
+
+//抽象产品
+interface Person {
+    public function getName();
+}
+//具体产品实现
+class Teacher implements Person {
+    function getName() {
+        return "老师\n";
+    }
+}
+
+class Student implements Person {
+    function getName() {
+        return "学生\n";
+    }
+}
+
+//另一条产品线的抽象产品
+interface Grade {
+    function getYear();
+}
+//另一条产品线的具体产品
+class Grade1 implements Grade {
+    public function getYear() {
+        return '2003级';
+    }
+}
+class Grade2 implements Grade {
+    public function getYear() {
+        return '2004级';
+    }
+}
+
+//抽象工厂
+interface AbstractFactory {
+    function getPerson();
+    function getGrade();
+}
+//具体工厂可以产生每个产品线的产品
+class Grade1TeacherFactory implements AbstractFactory {
+    public function getPerson() {
+        return new Teacher();
+    }
+    public function getGrade() {
+        return new Grade1();
+    }
+}
+class Grade1StudentFactory implements AbstractFactory {
+    public function getPerson() {
+        return new Student();
+    }
+    public function getGrade() {
+        return new Grade1();
+    }
+}
+
+class Grade2StudentFactory implements AbstractFactory {
+    public function getPerson() {
+        return new Student();
+    }
+    public function getGrade() {
+        return new Grade2();
+    }
+}
+
+class Grade2TeacherFactory implements AbstractFactory {
+    public function getPerson() {
+        return new Teacher();
+    }
+    public function getGrade() {
+        return new Grade2();
+    }
+}
+
+$a = new Grade2StudentFactory();
+$b = $a->getPerson()->getName();
+$c = $a->getGrade()->getYear();
+var_dump($b);
+var_dump($c);
