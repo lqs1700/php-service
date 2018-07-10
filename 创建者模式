@@ -1,0 +1,52 @@
+<?php
+
+//购物车
+class ShoppingCart {
+    //选中的商品
+    private $_goods = array();
+    //使用的优惠券
+    private $_tickets = array();
+
+    public function addGoods($goods) {
+        $this->_goods[] = $goods;
+    }
+
+    public function addTicket($ticket) {
+        $this->_tickets[] = $ticket;
+    }
+
+    public function printInfo() {
+        printf("goods:%s, tickets:%s\n", implode(',', $this->_goods), implode(',', $this->_tickets));
+    }
+}
+
+//创建者类用来封装购物车的数据组装
+class CardBuilder {
+    private $_card;
+    function __construct($card) {
+        $this->_card = $card;
+    }
+    function build($data) {
+        foreach ($data['goods'] as $goods) {
+            $this->_card->addGoods($goods);
+        }
+        foreach ($data['tickets'] as $ticket) {
+            $this->_card->addTicket($ticket);
+        }
+    }
+    function getCrad() {
+        return $this->_card;
+    }
+}
+
+$data = array(
+    'goods' => array('衣服', '鞋子'),
+    'tickets' => array('减10'),
+);
+
+$cart = new ShoppingCart();
+$builder = new CardBuilder($cart);
+$builder->build($data);
+var_dump($builder->getCrad());
+echo "after builder:\n";
+$cart->printInfo();
