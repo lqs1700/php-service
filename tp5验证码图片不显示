@@ -1,2 +1,21 @@
+
+/vendor/topthink/think-captcha/src
+
 ControllerCatpchar
+
 ob_clean();
+
+
+namespace think\captcha;
+
+use think\Config;
+
+class CaptchaController
+{
+    public function index($id = "")
+    {
+        ob_clean();
+        $captcha = new Captcha((array)Config::get('captcha'));
+        return $captcha->entry($id);
+    }
+}
